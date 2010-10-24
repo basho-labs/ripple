@@ -35,7 +35,7 @@ module Riak
     attr_accessor :vclock
     alias_attribute :vector_clock, :vclock
 
-    # @return [Set<Link>] a Set of {Riak::Link} objects for relationships between this object and other resources
+    # @return [Array<Link>] a Array of {Riak::Link} objects for relationships between this object and other resources
     attr_accessor :links
 
     # @return [String] the ETag header from the most recent HTTP response, useful for caching and reloading
@@ -69,7 +69,7 @@ module Riak
     # @see Bucket#get
     def initialize(bucket, key=nil)
       @bucket, @key = bucket, key
-      @links, @meta = Set.new, {}
+      @links, @meta = Array.new, {}
       yield self if block_given?
     end
 
@@ -79,7 +79,7 @@ module Riak
       extract_header(response, "location", :key) {|v| URI.unescape(v.split("/").last) }
       extract_header(response, "content-type", :content_type)
       extract_header(response, "x-riak-vclock", :vclock)
-      extract_header(response, "link", :links) {|v| Set.new(Link.parse(v)) }
+      extract_header(response, "link", :links) {|v| Array.new(Link.parse(v)) }
       extract_header(response, "etag", :etag)
       extract_header(response, "last-modified", :last_modified) {|v| Time.httpdate(v) }
       @meta = response[:headers].inject({}) do |h,(k,v)|
@@ -322,7 +322,7 @@ module Riak
       extract_if_present(metadata, 'content-type', :content_type)
       extract_if_present(metadata, 'X-Riak-Last-Modified', :last_modified) { |v| Time.httpdate( v ) }
       extract_if_present(metadata, 'Links', :links) do |links|
-        Set.new( links.map { |l| Link.new("#{@bucket.client.prefix}#{l[0]}/#{l[1]}", l[2]) } )
+        Array.new( links.map { |l| Link.new("#{@bucket.client.prefix}#{l[0]}/#{l[1]}", l[2]) } )
       end
       extract_if_present(metadata, 'X-Riak-Meta', :meta) do |meta|
         Hash[
