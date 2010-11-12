@@ -110,7 +110,7 @@ module Riak
                   require 'curb'
                   CurbBackend.new(self)
                 rescue LoadError, NameError
-                  warn t("install_curb")
+                  #warn t("install_curb")
                   NetHTTPBackend.new(self)
                 end
     end
