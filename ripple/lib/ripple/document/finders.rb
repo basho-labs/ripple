@@ -57,7 +57,7 @@ module Ripple
         def find(*args)
           args.flatten!
           return nil if args.empty? || args.all?(&:blank?)
-          return find_one(args.first) if args.one?
+          return find_one(args.first) if args.size == 1
           args.map {|key| find_one(key) }
         end
         
