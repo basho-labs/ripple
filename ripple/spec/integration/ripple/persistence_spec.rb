@@ -16,7 +16,7 @@ require File.expand_path("../../../spec_helper", __FILE__)
 describe "Ripple Persistence" do
   require 'support/test_server'
 
-  before :all do    
+  before :all do
     Object.module_eval do
       class Widget
         include Ripple::Document
@@ -25,17 +25,17 @@ describe "Ripple Persistence" do
       end
     end
   end
-  
+
   before :each do
     @widget = Widget.new
   end
-  
+
   it "should save an object to the riak database" do
     @widget.save
     @found = Widget.find(@widget.key)
     @found.should be_a(Widget)
   end
-  
+
   it "should save attributes properly to riak" do
     @widget.attributes = {:name => 'Sprocket', :size => 10}
     @widget.save
@@ -43,7 +43,37 @@ describe "Ripple Persistence" do
     @found.name.should == 'Sprocket'
     @found.size.should == 10
   end
-  
+
+  context "when conflicts are found" do
+    before(:all) do
+      Widget.bucket.allow_mult = true
+    end
+
+    after(:all) do
+      Widget.bucket.allow_mult = false
+    end
+
+    let(:refrence_1) { Widget.create(:name => "Foo") }
+    let(:refrence_2) { Widget.find(refrence_1.key)   }
+
+    before do
+      refrence_1.name = "Fizz"
+      refrence_2.name = "Buzz"
+      refrence_1.save
+      refrence_2.save
+      # the tests depend on this, but it's not what's being tested
+      refrence_2.robject.should be_conflict
+    end
+
+    it "should find documents with conflicts without error" do
+      lambda { Widget.find(refrence_1.key) }.should_not raise_error
+    end
+
+    it "should reload documents with conflicts without error" do
+      lambda { refrence_2.reload }.should_not raise_error
+    end
+  end
+
   after :each do
     Widget.destroy_all
   end

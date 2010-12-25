@@ -23,4 +23,5 @@ en:
     missing_configuration: "You are missing your ripple configuration file that should be at %{file}"
     no_root_document: "You cannot call %{method} on %{doc} without a root document"
     property_type_mismatch: "Cannot cast %{value} into a %{class}"
+    unknown_attribute: "unknown attribute '%{name}'"
 

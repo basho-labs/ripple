@@ -67,11 +67,13 @@ module Ripple
         raise ArgumentError, t('attribute_hash') unless Hash === attrs
         sanitize_for_mass_assignment(attrs).each do |k,v|
           next if k.to_sym == :key
-          if respond_to?("#{k}=")
-            __send__("#{k}=",v)
-          else
-            __send__(:attribute=,k,v)
+          next if k == "_type"
+
+          unless respond_to?("#{k}=")
+            raise ArgumentError, t('unknown_attribute', :name => k)
           end
+
+          __send__("#{k}=",v)
         end
       end
 
