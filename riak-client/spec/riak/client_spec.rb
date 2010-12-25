@@ -185,6 +185,12 @@ describe Riak::Client do
       @http.should_receive(:get).with(200, "/riak/", "foo%2Fbar%20", {:keys => false}, {}).and_return(@payload)
       @client.bucket("foo/bar ", :keys => false)
     end
+
+    it "should memoize bucket parameters" do
+      @http.should_receive(:get).once.with(200, "/riak/", "baz", {:keys => false}, {}).and_return(@payload)
+      @client.bucket("baz")
+      @client.bucket("baz")
+    end
   end
 
   describe "storing a file" do

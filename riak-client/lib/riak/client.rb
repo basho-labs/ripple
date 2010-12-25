@@ -140,8 +140,11 @@ module Riak
       unless (options.keys - [:keys, :props]).empty?
         raise ArgumentError, "invalid options"
       end
-      response = http.get(200, prefix, escape(name), {:keys => false}.merge(options), {})
-      Bucket.new(self, name).load(response)
+      @@bucket_cache ||= {}
+      @@bucket_cache[[name, options]] ||= begin
+        response = http.get(200, prefix, escape(name), {:keys => false}.merge(options), {})
+        Bucket.new(self, name).load(response)
+      end
     end
     alias :[] :bucket
 
