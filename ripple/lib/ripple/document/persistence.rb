@@ -114,7 +114,9 @@ module Ripple
         # Sets document attributes from an robject.
         def load_robject(robject)
           if robject.conflict?
-            # diff and not set unresolvable conflicts?
+            resolver = Riak::Util::ConflictResolver.new(robject)
+            self.conflicts = resolver.conflicting
+            self.attributes = resolver.nonconflicting
           else
             self.attributes = robject.data if robject.data
           end

@@ -56,9 +56,10 @@ module Riak
 
   # Utility classes and mixins
   module Util
-    autoload :Escape,        "riak/util/escape"
-    autoload :Headers,       "riak/util/headers"
-    autoload :Multipart,     "riak/util/multipart"
-    autoload :Translation,   "riak/util/translation"
+    autoload :Escape,           "riak/util/escape"
+    autoload :Headers,          "riak/util/headers"
+    autoload :Multipart,        "riak/util/multipart"
+    autoload :Translation,      "riak/util/translation"
+    autoload :ConflictResolver, "riak/util/conflict_resolver"
   end
 end
