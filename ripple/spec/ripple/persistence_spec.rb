@@ -178,7 +178,7 @@ describe Ripple::Document::Persistence do
     before :each do
       Widget.set_quorums :r => 1, :w => 1, :dw => 0, :rw => 1
       @bucket = mock("bucket", :name => "widgets")
-      @robject = mock("object", :data => {"name" => "bar"}, :key => "gear")
+      @robject = mock("object", :data => {"name" => "bar"}, :key => "gear", :conflict? => false)
       Widget.stub(:bucket).and_return(@bucket)
     end
 

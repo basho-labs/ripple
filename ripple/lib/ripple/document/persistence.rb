@@ -89,7 +89,7 @@ module Ripple
         def reload
           return self if new?
           robject.reload(:force => true)
-          self.__send__(:attributes=, @robject.data.except("_type"), false)
+          load_robject(@robject)
           self
         end
 
@@ -112,6 +112,15 @@ module Ripple
         def robject
           @robject ||= Riak::RObject.new(self.class.bucket, key).tap do |obj|
             obj.content_type = "application/json"
+          end
+        end
+
+        # Sets document attributes from an robject.
+        def load_robject(robject)
+          if robject.conflict?
+            handle_conflict(robject) if respond_to?(:handle_conflict)
+          else
+            self.__send__(:attributes=, robject.data.except('_type'), false) if robject.data
           end
         end
 
