@@ -22,5 +22,6 @@ en:
     invalid_association_value: "Invalid value %{value} for association %{name} of type %{klass} on %{owner}"
     missing_configuration: "You are missing your ripple configuration file that should be at %{file}"
     no_root_document: "You cannot call %{method} on %{doc} without a root document"
+    not_implemented: "You must implement %{method} when using %{context}"
     property_type_mismatch: "Cannot cast %{value} into a %{class}"
 

@@ -118,7 +118,7 @@ module Ripple
         # Sets document attributes from an robject.
         def load_robject(robject)
           if robject.conflict?
-            handle_conflict(robject) if respond_to?(:handle_conflict)
+            handle_conflict(robject)
           else
             self.__send__(:attributes=, robject.data.except('_type'), false) if robject.data
           end

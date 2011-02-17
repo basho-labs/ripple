@@ -46,12 +46,14 @@ module Ripple
     autoload :Finders
     autoload :Key
     autoload :Persistence
+    autoload :ConflictHandling
 
     included do
       extend ActiveModel::Naming
       extend BucketAccess
       include Ripple::Document::Key
       include Ripple::Document::Persistence
+      include Ripple::Document::ConflictHandling
       extend Ripple::Properties
       include Ripple::AttributeMethods
       include Ripple::Timestamps

@@ -46,15 +46,29 @@ describe "Ripple Persistence" do
 
   context "when conflicts are found" do
     before(:all) do
-      Widget.bucket.allow_mult = true
+      class Widget
+        Widget.bucket.allow_mult = true
+
+        def has_called_handle_conflict?
+          @handle_conflict_called == true
+        end
+
+        def handle_conflict(robject)
+          @handle_conflict_called = true
+        end
+      end
     end
 
     after(:all) do
-      Widget.bucket.allow_mult = false
+      class Widget
+        Widget.bucket.allow_mult = false
+        undef has_called_handle_conflict?
+        undef handle_conflict
+      end
     end
 
     let(:reference_1) { Widget.create(:name => "Foo") }
-    let(:reference_2) { Widget.find(reference_1.key)   }
+    let(:reference_2) { Widget.find(reference_1.key)  }
 
     before do
       reference_1.name = "Fizz"
@@ -65,28 +79,34 @@ describe "Ripple Persistence" do
       reference_2.robject.should be_conflict
     end
 
-    it "should find documents with conflicts without error" do
-      lambda { Widget.find(reference_1.key) }.should_not raise_error
-    end
+    describe '#handle_conflict' do
+      it 'is called on find' do
+        another_reference = Widget.find(reference_1.key)
+        another_reference.should have_called_handle_conflict
+      end
 
-    it "should reload documents with conflicts without error" do
-      lambda { reference_2.reload }.should_not raise_error
-    end
-
-    describe "#handle_conflict(robject)" do
-      # Note: no need to assert not calling it when it's
-      # not defined, as that would raise an undefined method error
-      # in the tests above.
-
-      it 'is called when defined' do
-        def reference_1.has_called_handle_conflict?
-          @handle_conflict_called == true
-        end
-        def reference_1.handle_conflict(robject)
-          @handle_conflict_called = true
-        end
+      it 'is called on reload' do
         reference_1.reload
         reference_1.should have_called_handle_conflict
+      end
+
+      context 'when undefined' do
+        after(:each) do
+          # Need this so destroy_all works later
+          class Widget
+            def handle_conflict(robject)
+              @handle_conflict_called = true
+            end
+          end
+        end
+
+        it 'raises a NotImplementedError' do
+          class Widget
+            remove_method :handle_conflict
+          end
+
+          lambda { reference_1.reload }.should raise_error(NotImplementedError)
+        end
       end
     end
   end
