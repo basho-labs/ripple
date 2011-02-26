@@ -259,7 +259,7 @@ describe Ripple::Property do
       end
       
       it "should cast a serialized array into an actualized one" do
-        @prop.type_cast([1,2,3,4].to_json).should == [1, 2, 3, 4]
+        @prop.type_cast([1,"This is a string",3.0].to_json).should == [1, "This is a string", 3.0]
       end
     end
   end
