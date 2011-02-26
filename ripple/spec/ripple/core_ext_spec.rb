@@ -104,3 +104,14 @@ describe "Boolean" do
     }.should_not raise_error(NameError)
   end
 end
+
+describe "List" do
+  it "should be available to properties on documents" do
+    lambda {
+      class ListTest
+        include Ripple::Document
+        property :foo, List
+      end
+    }.should_not raise_error(NameError)
+  end
+end

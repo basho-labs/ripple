@@ -252,5 +252,15 @@ describe Ripple::Property do
         @prop.type_cast("  ").should be_nil
       end
     end
+    
+    describe "when type is a List type" do
+      before :each do
+        @prop = Ripple::Property.new(:foo, List)
+      end
+      
+      it "should cast a serialized array into an actualized one" do
+        @prop.type_cast([1,2,3,4].to_json).should == [1, 2, 3, 4]
+      end
+    end
   end
 end

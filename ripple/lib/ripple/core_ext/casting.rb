@@ -131,6 +131,19 @@ class DateTime
 end
 
 # @private
+class List
+  def as_json(options={})
+    self.to_json
+  end
+  
+  def self.ripple_cast(value)
+    return nil if value.blank?
+    value.respond_to?(:to_s) && JSON.parse(value) or raise Ripple::PropertyTypeMismatch.new(self, value)
+  end
+end
+
+
+# @private
 module ActiveSupport
   class TimeWithZone
     def as_json(options={})
