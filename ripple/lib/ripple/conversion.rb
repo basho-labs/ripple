@@ -37,5 +37,11 @@ module Ripple
     def to_param
       key
     end
+    
+    # Converts to json
+    def to_json
+      attributes.to_json
+    end
+    
   end
 end

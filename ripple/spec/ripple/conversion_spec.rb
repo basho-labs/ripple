@@ -32,4 +32,9 @@ describe Ripple::Conversion do
   it "should be able to be converted to a model" do
     @box.to_model.should == @box
   end
+  
+  it "should be able to convert itself to json" do
+    @box.shape = "square"
+    @box.to_json.should match(/\{\"created_at\":\"(.*)\",\"shape\":\"square\",\"updated_at\":null\}/)
+  end
 end
