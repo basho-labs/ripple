@@ -93,10 +93,9 @@ describe Ripple::NestedAttributes do
       end
 
       it "should save the children when saving the parent" do
-        subject.passengers.each do |passenger|
-          passenger.should_receive(:save)
-        end
         subject.save
+        found_subject = Car.find(subject.key)
+        found_subject.passengers.map(&:name).should =~ %w[ Joe Sue Pat ]
       end
     end
 
@@ -134,12 +133,16 @@ describe Ripple::NestedAttributes do
 
       it "should save the child when saving the parent" do
         subject.passengers_attributes = [ { :key => passenger1.key, :name => 'UPDATED One' },
-                                          { :key => passenger1.key, :name => 'UPDATED Two' },
-                                          { :key => passenger1.key, :name => 'UPDATED Three' } ]
-        subject.passengers.each do |passenger|
-          passenger.should_receive(:save)
-        end
+                                          { :key => passenger2.key, :name => 'UPDATED Two' },
+                                          { :key => passenger3.key, :name => 'UPDATED Three' } ]
         subject.save
+
+        found_subject = Car.find(subject.key)
+        found_subject.passengers.map(&:name).should =~ [
+          'UPDATED One',
+          'UPDATED Two',
+          'UPDATED Three'
+        ]
       end
     end
   end

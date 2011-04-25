@@ -8,10 +8,22 @@ module Ripple
       include Many
       include Linked
 
+      def count
+        # avoid having to load all documents by using our keys set instead
+        keys.size
+      end
+
       def <<(value)
-        load_target
-        new_target = @target.concat(Array(value))
-        replace new_target
+        if loaded?
+          new_target = @target.concat(Array(value))
+          replace new_target
+        else
+          @reflection.verify_type!([value], @owner)
+          @owner.robject.links << value.to_link(@reflection.link_tag)
+          appended_documents << value
+          @keys = nil
+        end
+
         self
       end
 
@@ -22,9 +34,32 @@ module Ripple
         self
       end
 
+      def reset
+        @appended_documents = nil
+        super
+      end
+
+      def loaded_documents
+        (super + appended_documents).uniq
+      end
+
       protected
+
       def find_target
-        robjects.map {|robj| klass.send(:instantiate, robj) }
+        robjs = robjects
+
+        robjs.delete_if do |robj|
+          appended_documents.any? do |doc|
+            doc.key == robj.key &&
+            doc.class.bucket_name == robj.bucket.name
+          end
+        end
+
+        appended_documents + robjs.map {|robj| klass.send(:instantiate, robj) }
+      end
+
+      def appended_documents
+        @appended_documents ||= []
       end
     end
   end
