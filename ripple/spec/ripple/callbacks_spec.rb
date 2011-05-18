@@ -45,6 +45,40 @@ describe Ripple::Callbacks do
       @box.save
     end
 
+    it 'does not persist the object to riak multiple times when propagating callbacks' do
+      Box.before_save { }
+      BoxSide.before_save { }
+      @box = Box.new
+      @box.sides << BoxSide.new << BoxSide.new
+
+      @box.robject.should_receive(:store).once
+      @box.save
+    end
+
+    it 'invokes the before/after callbacks in the correct order on embedded associated documents' do
+      callbacks = []
+      BoxSide.before_save { callbacks << :before_save }
+      BoxSide.after_save  { callbacks << :after_save  }
+
+      @box = Box.new
+      @box.sides << BoxSide.new
+      @box.robject.stub(:store) do
+        callbacks << :save
+      end
+      @box.save
+
+      callbacks.should == [:before_save, :save, :after_save]
+    end
+
+    it 'does not propagate validation callbacks multiple times' do
+      Box.before_validation { $pinger.ping }
+      BoxSide.before_validation { $pinger.ping }
+      $pinger.should_receive(:ping).exactly(2).times
+      @box = Box.new
+      @box.sides << BoxSide.new
+      @box.valid?
+    end
+
     it "should call create callbacks on save when the document is new" do
       Box.before_create { $pinger.ping }
       Box.after_create { $pinger.ping }

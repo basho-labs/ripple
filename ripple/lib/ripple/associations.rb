@@ -136,22 +136,26 @@ module Ripple
       # This is necessary so that when a parent is saved, the embedded child's before_save
       # hooks are run as well.
       # @private
-      def run_callbacks(*args, &block)
-        self.class.embedded_associations.each do |association|
+      def run_callbacks(name, *args, &block)
+        # validation is already propagated to embedded documents via the
+        # AssociatedValidator.  We don't need to duplicate the propgation here.
+        return super if name == :validation
+
+        associated_docs = self.class.embedded_associations.map do |association|
           documents = instance_variable_get(association.ivar)
           # We must explicitly check #nil? (rather than just saying `if documents`)
           # because documents can be an association proxy that is proxying nil.
           # In this case ruby treats documents as true because it is not _really_ nil,
           # but #nil? will tell us if it is proxying nil.
 
-          unless documents.nil?
-            Array(documents).each do |doc|
-              doc.run_callbacks(*args, &block)
-            end
-          end
+          Array(documents) unless documents.nil?
+        end.flatten.compact
+
+        propagate_callbacks = associated_docs.reverse.inject(block) do |blk, doc|
+          lambda { doc.run_callbacks(name, *args, &blk) }
         end
 
-        super
+        super(name, *args, &propagate_callbacks)
       end
     end
   end
