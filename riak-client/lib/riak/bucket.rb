@@ -36,12 +36,11 @@ module Riak
     # results of the operation will not be retained in the local Bucket object.
     # @param [Hash] options extra options
     # @yield [Array<String>] a list of keys from the current chunk
-    # @option options [Boolean] :reload (false) If present, will force reloading of the bucket's keys from Riak
     # @return [Array<String>] Keys in this bucket
-    def keys(options={}, &block)
+    def keys(&block)
       if block_given?
         @client.backend.list_keys(self, &block)
-      elsif @keys.nil? || options[:reload]
+      else
         @keys = @client.backend.list_keys(self)
       end
       @keys

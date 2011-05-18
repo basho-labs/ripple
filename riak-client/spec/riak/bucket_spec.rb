@@ -25,15 +25,9 @@ describe Riak::Bucket do
   end
 
   describe "accessing keys" do
-    it "should load the keys if not present" do
+    it "should load the keys" do
       @backend.should_receive(:list_keys).with(@bucket).and_return(["bar"])
       @bucket.keys.should == ["bar"]
-    end
-
-    it "should allow reloading of the keys" do
-      @backend.should_receive(:list_keys).with(@bucket).and_return(["bar"])
-      @bucket.instance_variable_set(:@keys, ["foo"])
-      @bucket.keys(:reload => true).should == ["bar"]
     end
 
     it "should allow streaming keys through block" do
