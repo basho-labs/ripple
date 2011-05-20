@@ -45,11 +45,18 @@ module Ripple
         #   Find a list of documents.
         #   @param [Array<String>] keylist an array of keys to find
         #   @return [Array<Document>] a list of found documents, including nil for missing documents
+        # @overload find(key1, key2, ...) {|doc| ... }
+        #   Stream documents for given keys through the block.
+        #   @yield [Document] doc a found document
         def find(*args)
           args.flatten!
           return nil if args.empty? || args.all?(&:blank?)
           return find_one(args.first) if args.size == 1
-          args.map {|key| find_one(key) }
+          if block_given?
+            args.each {|key| yield find_one(key)}
+          else
+            find_many(*args)
+          end
         end
 
         # Retrieve single or multiple documents from Riak
@@ -92,10 +99,7 @@ module Ripple
             end
             []
           else
-            bucket.keys.inject([]) do |acc, k|
-              obj = find_one(k)
-              obj ? acc << obj : acc
-            end
+            find_many(*bucket.keys).compact
           end
         end
 
@@ -104,6 +108,18 @@ module Ripple
           instantiate(bucket.get(key, quorums.slice(:r)))
         rescue Riak::FailedRequest => fr
           raise fr unless fr.not_found?
+        end
+
+        def find_many(*keys)
+          return [] if keys.empty?
+
+          mapreduce = Riak::MapReduce.new(bucket.client)
+          keys.reduce(mapreduce) do |memo, key|
+            memo.add bucket.name, key
+          end
+          mapreduce.map('function(value) {return [value]}', keep: true)
+          indexed = Riak::RObject.load_from_mapreduce(bucket.client, mapreduce.run).map {|robject| instantiate(robject)}.reduce({}) {|memo, doc| memo[doc.key] = doc ; memo}
+          keys.map {|key| indexed[key]}
         end
 
         def instantiate(robject)
