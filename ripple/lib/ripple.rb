@@ -48,13 +48,28 @@ module Ripple
       config[:date_format] = format.to_sym
     end
 
+    # It reads the serializer that the system uses
+    def serializer
+      ActiveSupport::JSON.backend
+    end
+
+    # Sets the serializer that the system will use e.g. "yajl", "json_gem" etc
+    def serializer=(name)
+      ActiveSupport::JSON.backend = name
+      config[:serializer] = name.to_sym
+    rescue LoadError => e
+      config.delete(:serializer)
+      raise e
+    end
+
     # Loads the Ripple configuration from a given YAML file.
     # Evaluates the configuration with ERB before loading.
     def load_configuration(config_file, config_keys = [:ripple])
       config_file = File.expand_path(config_file)
       config_hash = YAML.load(ERB.new(File.read(config_file)).result).with_indifferent_access
-      config_keys.each {|k| config_hash = config_hash[k]}
+      config_keys.each { |k| config_hash = config_hash[k] }
       self.config = config_hash || {}
+      self.serializer = config[:serializer] if config[:serializer].present?
     rescue Errno::ENOENT
       raise Ripple::MissingConfiguration.new(config_file)
     end
@@ -77,3 +92,4 @@ module Ripple
 end
 
 require 'ripple/railtie' if defined? Rails::Railtie
+
