@@ -50,4 +50,14 @@ describe Riak::Util::Multipart::StreamParser do
     end
     parser.accept File.read("spec/fixtures/multipart-mapreduce.txt")
   end
+
+  it "works properly when chunked encoding includes the hex octet sizes" do
+    block.should_receive(:ping).twice.and_return(true)
+    parser = klass.new do |result|
+      block.ping
+      result[:headers]['content-type'].should include("application/json")
+      lambda { Riak::JSON.parse(result[:body]) }.should_not raise_error
+    end
+    parser.accept File.read("spec/fixtures/multipart-mapreduce-with-chunking.txt")
+  end
 end

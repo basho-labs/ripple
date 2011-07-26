@@ -41,7 +41,7 @@ module Riak
 
         def get_boundary
           if @buffer =~ CAPTURE_BOUNDARY
-            @re = /\r?\n--#{Regexp.escape($1)}(?:--)?\r?\n/
+            @re = /(?:[a-fA-F0-9]+\r?\n)?\r?\n--#{Regexp.escape($1)}(?:--)?\r?\n/
             @buffer = $~.post_match
             buffering
           else
