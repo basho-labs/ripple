@@ -7,7 +7,7 @@ module Ripple
       # Cucumber
       def create_cucumber_file
         if File.directory?(Rails.root + "features/support")
-          insert_into_file 'features/support/ripple.rb', "\n\nAfter do\n  Ripple::TestServer.clear\nend", :after => "Ripple::TestServer.setup"
+          template "ripple.rb", "features/support/ripple.rb"
         end
       end
 
