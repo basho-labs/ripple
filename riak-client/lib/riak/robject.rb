@@ -253,7 +253,7 @@ module Riak
              else
                @raw_data && "(#{@raw_data.size} bytes)"
              end
-      "#<#{self.class.name} {#{bucket.name}#{"," + @key if @key}} [#{@content_type}]:#{body}>"
+      "#<#{self.class.name} {#{bucket.name}#{"," + @key.to_s if @key}} [#{@content_type}]:#{body}>"
     end
 
     # Walks links from this object to other objects in Riak.

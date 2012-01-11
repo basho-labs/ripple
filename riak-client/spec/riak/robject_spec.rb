@@ -388,6 +388,12 @@ describe Riak::RObject do
       object.inspect.should be_kind_of(String)
     end
 
+    it "should handle integer keys" do
+      object.key = 100
+      expect { object.inspect }.not_to raise_error
+      object.inspect.should be_kind_of(String)
+    end
+
     it 'uses the serializer output in inspect' do
       object.raw_data = { 'a' => 7 }
       object.content_type = 'inspect/type'
