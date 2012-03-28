@@ -57,7 +57,7 @@ module Ripple
     def hash
       parent = [_parent_document.class]
       parent << [_parent_document.key] if _parent_document.respond_to?(:key)
-      [ self.class, parent, serializable_hash ].hash
+      [ self.class, parent, serializable_hash.to_s ].hash
     end
   end
 end
