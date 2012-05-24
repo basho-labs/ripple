@@ -16,12 +16,3 @@ module Ripple
     end
   end
 end
-
-module Riak::Client
-  class NetHTTPBackend
-    include Ripple::Instrumentation::HTTP
-  end
-  class ExconBackend
-    include Ripple::Instrumentation::HTTP
-  end
-end

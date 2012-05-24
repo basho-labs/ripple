@@ -23,7 +23,3 @@ module Ripple
     end
   end
 end
-
-class Riak::Client::BeefcakeProtobuffsBackend
-  include Ripple::Instrumentation::Protobuffs
-end
