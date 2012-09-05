@@ -2,6 +2,7 @@
 development:
   http_port: 8098
   pb_port: 8087
+  handoff_port: 8080
   host: 127.0.0.1
   source: /usr/local/bin  #Default for Homebrew.
 
@@ -16,6 +17,7 @@ test:
   http_port: 9000
   pb_port: 9002
   host: 127.0.0.1
+  handoff_port: 8080
   source: /usr/local/bin   # Default for Homebrew.
   js_source_dir: <%%= Rails.root + "app/mapreduce" %>
 
