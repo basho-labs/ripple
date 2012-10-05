@@ -8,10 +8,10 @@ module Ripple
       include Many
       include Linked
 
-      def count
-        # avoid having to load all documents by using our keys set instead
-        keys.size
-      end
+      # def count
+      #   # avoid having to load all documents by using our keys set instead
+      #   keys.size
+      # end
 
       def <<(value)
         if loaded?

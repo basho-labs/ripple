@@ -67,9 +67,10 @@ describe Ripple::Associations::ManyLinkedProxy do
     @person.tasks.should == [@other_task]
   end
 
-  it "asks the keys set for the count to avoid having to unnecessarily load all documents" do
-    @person.tasks.keys.stub(:size => 17)
-    @person.tasks.count.should == 17
+  it "loads the documents to determine how many documents are linked" do
+    @person.tasks.keys.should_not_receive(:size)
+    @person.tasks << @task
+    @person.tasks.count.should == 1
   end
 
   # it "should be able to build a new associated document" do
