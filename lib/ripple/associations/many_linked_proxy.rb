@@ -57,9 +57,9 @@ module Ripple
 
       def read_repair_association(validated_docs, tagged_as)
         matched_keys = validated_docs.map{|o| o.key}
-        @owner.robject.links.keep_if { |link|
-          matched_keys.include?(link.key) ||
-          link.tag != tagged_as
+        @owner.robject.links.delete_if { |link|
+          ! (matched_keys.include?(link.key) ||
+             link.tag != tagged_as)
         }
       end
 
