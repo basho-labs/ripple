@@ -10,6 +10,7 @@ module Ripple
 
       def initialize(document, tag)
         @document = document
+        @link_tag = tag
         super(document.class.bucket_name, nil, tag)
       end
 
@@ -19,6 +20,10 @@ module Ripple
 
       def hash
         document.hash
+      end
+
+      def tag
+        @link_tag
       end
     end
 

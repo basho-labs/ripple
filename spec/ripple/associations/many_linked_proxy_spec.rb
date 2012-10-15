@@ -8,8 +8,37 @@ describe Ripple::Associations::ManyLinkedProxy do
     @task = Task.new {|t| t.key = "one" }
     @other_task = Task.new {|t| t.key = "two" }
     @third_task = Task.new {|t| t.key = "three" }
-    [@person, @task, @other_task].each do |doc|
+    @profile = Profile.new {|p| p.key = "test-profile"}
+    [@person, @task, @other_task, @profile].each do |doc|
       doc.stub!(:new?).and_return(false)
+    end
+  end
+
+  describe "#instantiate" do
+    context "all links are dead" do
+      it "should remove links that could not be instantiated" do
+        @person.robject.links << @task.to_link("tasks")
+        @person.tasks.inspect # trigger load_object
+        @person.robject.links.should be_empty
+      end
+    end
+    context "only some links are dead" do
+      it "should remove links that could not be instantiated" do
+        @person.robject.links << @task.to_link("tasks")
+        @person.tasks << @other_task
+        @person.tasks.inspect
+        @person.robject.links.should have(1).item
+        @person.robject.links.should include(@other_task.to_link("tasks"))
+      end
+    end
+    context "owner also links to objects of another type" do
+      it "should only remove dead links of the accessed association" do
+        @person.profile = @profile
+        @person.robject.links << @task.to_link("tasks")
+        @person.robject.links.should have(2).item
+        @person.tasks.inspect
+        @person.robject.links.should have(1).item
+      end
     end
   end
 
