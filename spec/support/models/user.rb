@@ -7,6 +7,7 @@ class User
 
   property :email, String, :presence => true
   many :friends, :class_name => "User"
+  many :enemies, :class_name => "User"
   one :emergency_contact, :class_name => "User"
   one :credit_card, :using => :key
 end

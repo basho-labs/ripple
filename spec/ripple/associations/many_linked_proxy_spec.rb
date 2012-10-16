@@ -40,6 +40,28 @@ describe Ripple::Associations::ManyLinkedProxy do
         @person.robject.links.should have(1).item
       end
     end
+    context "the association uses a custom name" do
+      it "should remove links that could not be instantiated" do
+        user = User.new {|u| u.key = "user-john"}
+        friend1 = User.new {|u| u.key = "user-friend1" }
+        friend2 = User.new {|u| u.key = "user-friend2" }
+        user.robject.links << friend1.to_link("friends")
+        user.robject.links << friend2.to_link("friends")
+        user.friends.inspect
+        user.robject.links.should be_empty
+      end
+
+      it "should only remove links that match the custom assocation name" do
+        user = User.new {|u| u.key = "user-user"}
+        friend = User.new {|u| u.key = "user-friend0" }
+        enemy = User.new {|u| u.key = "user-enemy0" }
+        user.robject.links << friend.to_link("friends")
+        user.enemies << enemy
+        user.friends.inspect
+        user.robject.links.should have(1).item
+        user.robject.links.should include(enemy.to_link("enemies"))
+      end
+    end
   end
 
   it "should be empty before any associated documents are set" do

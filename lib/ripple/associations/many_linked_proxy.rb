@@ -51,15 +51,15 @@ module Ripple
         end
 
         docs = appended_documents + robjs.map {|robj| klass.send(:instantiate, robj) }
-        read_repair_association docs, klass.bucket_name
+        read_repair_association docs
         docs
       end
 
-      def read_repair_association(validated_docs, tagged_as)
+      def read_repair_association(validated_docs)
         matched_keys = validated_docs.map{|o| o.key}
         @owner.robject.links.delete_if { |link|
           ! (matched_keys.include?(link.key) ||
-             link.tag != tagged_as)
+             link.tag != reflection.name.to_s )
         }
       end
 
