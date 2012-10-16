@@ -54,11 +54,6 @@ namespace :spec do
     spec.rspec_opts = %w[--profile --tag integration]
   end
 
-  desc "Run Focused Specs Only"
-  RSpec::Core::RakeTask.new(:focus) do |spec|
-    spec.rspec_opts = %w[--tag focus --format doc]
-  end
-
   desc "Run All Specs"
   RSpec::Core::RakeTask.new(:all) do |spec|
     spec.rspec_opts = %w[--profile]
