@@ -48,12 +48,12 @@ module Ripple
         #   @return [Array<Document>] a list of found documents, including nil for missing documents
         def find(*args)
           if args.first.is_a?(Array)
-            args.flatten.map {|key| find_one(key) }
+            find_many(args.flatten)
           else
             args.flatten!
             return nil if args.empty? || args.all?(&:blank?)
             return find_one(args.first) if args.size == 1
-            args.map {|key| find_one(key) }
+            find_many(args)
           end
         end
 
@@ -111,6 +111,15 @@ module Ripple
         private
         def find_one(key)
           instantiate(bucket.get(key, quorums.slice(:r)))
+        rescue Riak::FailedRequest => fr
+          raise fr unless fr.not_found?
+        end
+
+        def find_many(keys)
+          robjects = bucket.get_many(keys)
+          keys.map do |k|
+            instantiate(robjects[k]) if robjects[k]
+          end
         rescue Riak::FailedRequest => fr
           raise fr unless fr.not_found?
         end
