@@ -128,7 +128,7 @@ module Ripple
           klass = robject.data['_type'].constantize rescue self
           klass.new.tap do |doc|
             doc.key = robject.key
-            doc.__send__(:raw_attributes=, robject.data.except("_type")) if robject.data
+            doc.__send__(:raw_attributes=, robject.data.except("_type")) if robject.raw_data.size != 0 && robject.data
             doc.instance_variable_set(:@new, false)
             doc.instance_variable_set(:@robject, robject)
             doc.changed_attributes.clear
