@@ -15,7 +15,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "minitest"
   gem.add_development_dependency "rspec", "~>2.8.0"
   gem.add_development_dependency "rake"
-  gem.add_development_dependency "riak_test_server"
 
   gem.add_dependency "riak-client", "~> 1.1"
   gem.add_dependency "activesupport", "~> 4.1.0"

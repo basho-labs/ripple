@@ -8,6 +8,10 @@ group :guard do
   gem 'growl'
 end
 
+group :development, :test do
+  gem "riak_test_server", git: "git@github.com:spreedly/riak_test_server.git", branch: :master
+end
+
 if File.directory?(File.expand_path("../../riak-ruby-client", __FILE__))
   gem 'riak-client', :path => "../riak-ruby-client"
 end
