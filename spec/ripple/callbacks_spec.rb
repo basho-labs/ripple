@@ -20,7 +20,6 @@ describe Ripple::Callbacks do
 
   it "should add create, update, save, and destroy callback declarations" do
     [:save, :create, :update, :destroy].each do |event|
-      doc.private_instance_methods.map(&:to_s).should include("_run_#{event}_callbacks")
       [:before, :after, :around].each do |time|
         doc.should respond_to("#{time}_#{event}")
       end
@@ -28,7 +27,6 @@ describe Ripple::Callbacks do
   end
 
   it "should validate callback declarations" do
-    doc.private_instance_methods.map(&:to_s).should include("_run_validation_callbacks")
     doc.should respond_to("before_validation")
     doc.should respond_to("after_validation")
   end
@@ -68,8 +66,8 @@ describe Ripple::Callbacks do
 
     it 'invokes the before/after callbacks in the correct order on embedded associated documents' do
       callbacks = []
-      embedded.before_save { callbacks << :before_save }
-      embedded.after_save  { callbacks << :after_save  }
+      embedded.before_save { callbacks << :embedded_before_save }
+      embedded.after_save  { callbacks << :embedded_after_save  }
 
       subject.embeddeds << embedded.new
       subject.robject.stub(:store) do
@@ -77,7 +75,7 @@ describe Ripple::Callbacks do
       end
       subject.save
 
-      callbacks.should == [:before_save, :save, :after_save]
+      callbacks.should == [:embedded_before_save, :save, :embedded_after_save]
     end
 
     it 'does not allow around callbacks on embedded associated documents' do

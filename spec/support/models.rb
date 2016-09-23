@@ -17,7 +17,6 @@
   widget
   address
   cardboard_box
-  clock_observer
   invoice
   paid_invoice
   late_invoice

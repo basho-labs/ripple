@@ -13,7 +13,6 @@ require 'ripple/timestamps'
 require 'ripple/validations'
 require 'ripple/associations'
 require 'ripple/callbacks'
-require 'ripple/observable'
 require 'ripple/conversion'
 require 'ripple/inspection'
 require 'ripple/nested_attributes'
@@ -61,7 +60,6 @@ module Ripple
       include Ripple::Validations
       include Ripple::Associations
       include Ripple::Callbacks
-      include Ripple::Observable
       include Ripple::Conversion
       include Ripple::Inspection
       include Ripple::NestedAttributes

@@ -1,5 +1,17 @@
 h1. Ripple Release Notes
 
+h2. 2.1.1 Patch Release
+
+Strips out (broken) rake tasks.
+
+h2. 2.1.0 Feature Release
+
+Removes support for ripple.yml configuration; configure with `Ripple.config = {}`.
+
+h2. 2.0.0 Major Release
+
+This moves Ripple forward to support Rails 4.1, and drops support for a lot of functionality not used by Spreedly (search, observers, etc.)
+
 h2. 0.9.5 Patch Release - 2011-06-14
 
 Release 0.9.5 is a minor bugfix release but also includes some small features.
@@ -202,7 +214,7 @@ This release has no new features but includes bug fixes and some internal refact
 
 h2. 0.7.0 Feature Release - 2010-05-06
 
-This release includes a number of new features.  The largest change is that the library is now split into two gems, 'riak-client' and 'ripple'.  'riak-client' supports ActiveSupport 2.3.5, 'ripple' only supports 3.0.0.beta3. 
+This release includes a number of new features.  The largest change is that the library is now split into two gems, 'riak-client' and 'ripple'.  'riak-client' supports ActiveSupport 2.3.5, 'ripple' only supports 3.0.0.beta3.
 
 A big kudos goes to Adam Hunter who contributed the majority of the new associations code.
 

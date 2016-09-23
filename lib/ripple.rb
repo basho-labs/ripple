@@ -30,7 +30,7 @@ module Ripple
 
     # Reads the global Ripple configuration.
     def config
-      @config ||= {}
+      @config
     end
 
     # The format in which date/time objects will be serialized to
@@ -48,38 +48,20 @@ module Ripple
       config[:date_format] = format.to_sym
     end
 
-    # Loads the Ripple configuration from a given YAML file.
-    # Evaluates the configuration with ERB before loading.
-    def load_configuration(config_file, config_keys = [:ripple])
-      config_file = File.expand_path(config_file)
-      config_hash = YAML.load(ERB.new(File.read(config_file)).result).with_indifferent_access
-      config_keys.each {|k| config_hash = config_hash[k]}
-      configure_ports(config_hash)
-      self.config = config_hash || {}
-    rescue Errno::ENOENT
-      raise Ripple::MissingConfiguration.new(config_file)
-    end
-    alias_method :load_config, :load_configuration
-
     private
-    def client_config
-      config.slice(*Riak::Client::VALID_OPTIONS)
+
+    def expect_config
+      config or raise(MissingConfiguration.new("No configuration set"))
     end
 
-    def configure_ports(config)
-      return unless config && config[:min_port]
-      config[:http_port] ||= (config[:min_port].to_i)
-      config[:pb_port] ||= (config[:min_port].to_i + 1)
+    def client_config
+      expect_config.slice(*Riak::Client::VALID_OPTIONS)
     end
   end
 
   # Exception raised when the path passed to
   # {Ripple::load_configuration} does not point to a existing file.
   class MissingConfiguration < StandardError
-    include Translation
-    def initialize(file_path)
-      super(t("missing_configuration", :file => file_path))
-    end
   end
 end
 

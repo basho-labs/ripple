@@ -6,7 +6,7 @@ en:
     cluster_not_created: "The cluster for the current environment is not created yet. Run `rake riak:create` first."
     conflict_handler_not_implemented: "No on_conflict handler has been implemented for %{document}"
     document_invalid: "Validation failed: %{errors}"
-    document_not_found: 
+    document_not_found:
       no_key: "Couldn't find document without a key"
       one_key: "Couldn't find document with key: %{key}"
       many_keys: "Couldn't find documents with keys: %{keys}"
@@ -15,7 +15,6 @@ en:
     invalid_association_value: "Invalid value %{value} for association %{name} of type %{klass} on %{owner}"
     many_association_validation_error: "are invalid (%{association_errors})"
     many_key_association: "You cannot use a many association using :key"
-    mass_assignment_roles_unsupported: "Roles for mass assignment are not supported for Rails 3.0"
     missing_configuration: "You are missing your ripple configuration file that should be at %{file}"
     no_root_document: "You cannot call %{method} on %{doc} without a root document"
     one_association_validation_error: "is invalid (%{association_errors})"

@@ -50,7 +50,7 @@ reply.to   = "sean@geeemail.com"
 reply.body = "Riak is a good fit for scalable Ruby apps."
 reply.save                               # POST /riak/emails (Riak-assigned key)
 
-# Documents can contain embedded documents, and link to other standalone documents 
+# Documents can contain embedded documents, and link to other standalone documents
 # via associations using the many and one class methods.
 class Person
   include Ripple::Document
@@ -84,49 +84,17 @@ person.account.paid_until = 3.months.from_now
 
 ## Configuration Example
 
-When using Ripple with Rails 3, add ripple to your Gemfile and then run the `ripple` generator.  This will generate a test harness, some MapReduce functions and a configuration file. Example:
+When using Ripple with Rails 4, add ripple to your Gemfile.
 
+Configure in an initializer:
+
+```ruby
+Ripple.config = {
+  host: "127.0.0.1",
+  http_port: ENV["RIAK_HTTP_PORT"] || 8098,
+  pb_port: ENV["RIAK_PB_PORT"] || 8087
+}
 ```
-$ rails g ripple
-      create  config/ripple.yml
-      create  app/mapreduce
-      create  app/mapreduce/contrib.js
-      create  app/mapreduce/ripple.js
-      create  test/ripple_test_helper.rb
-      insert  test/test_helper.rb
-      insert  test/test_helper.rb
-```
-
-`config/ripple.yml` should contain your Riak connection information, and settings for the test server. Example:
-
-``` yaml
-# Configure Riak connections for the Ripple library.
-development:
-  http_port: 8098
-  pb_port: 8087
-  host: 127.0.0.1
-
-# The test environment has additional keys for configuring the
-# Riak::TestServer for your test/spec suite:
-#
-# * bin_dir specifies the path to the "riak" script that you use to
-#           start Riak (just the directory)
-# * js_source_dir specifies where your custom Javascript functions for
-#           MapReduce should be loaded from. Usually app/mapreduce.
-test:
-  http_port: 9000
-  pb_port: 9002
-  host: 127.0.0.1
-  bin_dir: /usr/local/bin   # Default for Homebrew.
-  js_source_dir: <%%= Rails.root + "app/mapreduce" %>
-
-production:
-  http_port: 8098
-  pb_port: 8087
-  host: 127.0.0.1
-```
-
-`require 'ripple/railtie'` from your `config/application.rb` file to complete the integration.
 
 
 ## How to Contribute

@@ -1,39 +1,27 @@
-require 'riak/test_server'
+require 'riak_test_server'
 
-module TestServerSupport
-  def test_server
-    unless $test_server
-      begin
-        require 'yaml'
-        config = YAML.load_file(File.expand_path("../test_server.yml", __FILE__))
-        server = Riak::TestServer.create(:root => config['root'],
-                                         :source => config['source'],
-                                         :min_port => config['min_port'] || 15000)
-        $test_server = server
-      rescue => e
-        pending("Can't run ripple integration specs without the test server. Specify the location of your Riak installation in spec/support/test_server.yml\n#{e.inspect}")
-      end
-    end
-    $test_server
-  end
-end
+TEST_SERVER_HTTP_PORT = 10400
+TEST_SERVER_PB_PORT = 10500
 
 RSpec.configure do |config|
-  config.include TestServerSupport, :integration => true
+  config.before(:suite) do
+    RiakTestServer.setup(
+      http_port: TEST_SERVER_HTTP_PORT,
+      pb_port: TEST_SERVER_PB_PORT,
+      container_name: "ripple_tests"
+    )
+  end
 
-  config.before(:each, :integration => true) do
+  config.before(:each, integration: true) do
+    RiakTestServer.clear
     Ripple.config = {
-      :http_port => test_server.http_port,
-      :pb_port => test_server.pb_port
+      nodes: [
+        {
+          host: "docker",
+          http_port: TEST_SERVER_HTTP_PORT,
+          pb_port: TEST_SERVER_PB_PORT
+        }
+      ]
     }
-    test_server.start
-  end
-
-  config.after(:each, :integration => true) do
-    test_server.drop
-  end
-
-  config.after(:suite) do
-    $test_server.stop if $test_server
   end
 end

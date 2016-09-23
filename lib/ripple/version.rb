@@ -1,3 +1,3 @@
 module Ripple
-  VERSION = "1.0.0.beta2"
+  VERSION = "2.1.1"
 end

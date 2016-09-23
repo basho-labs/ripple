@@ -1,7 +1,7 @@
 require 'tzinfo'
 require 'active_support/json'
 require 'active_support/core_ext/object/blank'
-require 'active_support/core_ext/object/to_json'
+require 'active_support/core_ext/object/json'
 require 'active_support/core_ext/date/conversions'
 require 'active_support/core_ext/date/zones'
 require 'active_support/core_ext/date_time/conversions'

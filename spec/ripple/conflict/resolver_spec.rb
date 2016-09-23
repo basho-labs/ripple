@@ -8,10 +8,10 @@ module Ripple
       end
 
       describe 'calling the lambda returned by .to_proc' do
-        let(:sibling_1) { stub(:data => { '_type' => 'User' } ) }
-        let(:sibling_2) { stub(:data => { '_type' => 'User' } ) }
+        let(:sibling_1) { stub(:data => { '_type' => 'User' }, :content_type => 'application/json') }
+        let(:sibling_2) { stub(:data => { '_type' => 'User' }, :content_type => 'application/json') }
         let(:user_siblings) { [sibling_1, sibling_2] }
-        let(:wheel_sibling) { stub(:data => { '_type' => 'Wheel' } ) }
+        let(:wheel_sibling) { stub(:data => { '_type' => 'Wheel' }, :content_type => 'application/json') }
         let(:robject) { stub(:siblings => user_siblings) }
         let(:resolved_robject) { stub("Resolved RObject") }
         let(:resolved_document) { stub(:robject => resolved_robject) }
@@ -35,6 +35,25 @@ module Ripple
           described_class.should_not_receive(:new)
           described_class.to_proc.call(robject).should be_nil
         end
+
+        context 'when given an robject with no content type' do
+          let(:deleted_sibling) { stub(:data => "\0", :content_type => nil) }
+          let(:robject) { stub(:siblings => [sibling_1, deleted_sibling]) }
+          let(:resolved_document) { stub(:robject => sibling_1) }
+
+          it 'resolves the robject, and returns the resolved robject' do
+            described_class.
+              should_receive(:new).
+              with(robject, User).
+              and_return(resolver)
+
+            resolver.should_receive(:resolve)
+            resolver.stub(:document => resolved_document)
+
+            described_class.to_proc.call(robject).should be(sibling_1)
+          end
+        end
+
       end
     end
   end

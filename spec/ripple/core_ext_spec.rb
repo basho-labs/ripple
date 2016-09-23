@@ -1,9 +1,10 @@
 require 'spec_helper'
 
 describe Time do
-  before { @date_format = Ripple.date_format }
+  before { Ripple.config = {}; @date_format = Ripple.date_format }
   after  { Ripple.date_format = @date_format }
   subject { Time.utc(2010,3,16,12) }
+
   it "serializes to JSON in UTC, ISO 8601 format by default" do
     subject.as_json.should == "2010-03-16T12:00:00Z"
   end
@@ -25,7 +26,7 @@ describe Time do
 end
 
 describe Date do
-  before { @date_format = Ripple.date_format }
+  before { Ripple.config = {}; @date_format = Ripple.date_format }
   after  { Ripple.date_format = @date_format }
   subject { Date.civil(2010,3,16) }
   it "serializes to JSON ISO 8601 format by default" do
@@ -49,7 +50,7 @@ describe Date do
 end
 
 describe DateTime do
-  before { @date_format = Ripple.date_format }
+  before { Ripple.config = {}; @date_format = Ripple.date_format }
   after  { Ripple.date_format = @date_format }
   subject { DateTime.civil(2010,3,16,12) }
   before :each do
@@ -77,7 +78,7 @@ describe DateTime do
 end
 
 describe ActiveSupport::TimeWithZone do
-  before { @date_format = Ripple.date_format }
+  before { Ripple.config = {}; @date_format = Ripple.date_format }
   after  { Ripple.date_format = @date_format }
   let(:time) { Time.utc(2010,3,16,12) }
   let(:zone) { ActiveSupport::TimeZone['Alaska'] }

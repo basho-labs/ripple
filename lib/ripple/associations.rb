@@ -1,5 +1,6 @@
 require 'active_support/concern'
 require 'active_support/dependencies'
+require 'active_support/core_ext/array'
 require 'riak/walk_spec'
 require 'ripple/translation'
 require 'ripple/associations/proxy'
@@ -165,10 +166,18 @@ module Ripple
         next if documents.nil?
 
         Array(documents).each do |doc|
-          doc.send("_#{name}_callbacks").each do |callback|
-            next unless callback.kind == kind
-            doc.send(callback.filter)
-          end
+          cbs = doc.send("_#{name}_callbacks")
+          filtered_cbs = ActiveSupport::Callbacks::CallbackChain.new(
+            cbs.name,
+            cbs.config
+          )
+          filtered_cbs.append(
+            *cbs.select do |callback|
+              callback.kind == kind
+            end
+          )
+          runner = filtered_cbs.compile
+          runner.call(ActiveSupport::Callbacks::Filters::Environment.new(doc, false, nil, nil)).value
         end
       end
     end
@@ -373,7 +382,7 @@ module Ripple
     def find_class(scope, class_name)
       return nil if class_name.include?("::")
       class_sym = class_name.to_sym
-      parent_scope = scope.parents.unshift(scope).find {|s| ActiveSupport::Dependencies.local_const_defined?(s, class_sym) }
+      parent_scope = scope.parents.unshift(scope).find {|s| s.const_defined?(class_sym, false) }
       parent_scope.const_get(class_sym) if parent_scope
     end
   end

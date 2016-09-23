@@ -12,12 +12,13 @@ Gem::Specification.new do |gem|
   gem.authors = ["Sean Cribbs"]
 
   # Deps
+  gem.add_development_dependency "minitest"
   gem.add_development_dependency "rspec", "~>2.8.0"
-  gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'ammeter', '~>0.2.2'
+  gem.add_development_dependency "rake"
+
   gem.add_dependency "riak-client", "~> 1.1"
-  gem.add_dependency "activesupport", [">= 3.0.0", "< 3.3.0"]
-  gem.add_dependency "activemodel", [">= 3.0.0", "< 3.3.0"]
+  gem.add_dependency "activesupport", "~> 4.1.0"
+  gem.add_dependency "activemodel", "~> 4.1.0"
   gem.add_dependency "tzinfo"
 
   # Files

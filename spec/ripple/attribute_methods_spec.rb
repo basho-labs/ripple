@@ -19,10 +19,10 @@ describe Ripple::AttributeMethods do
       @widget.key.should == "cog"
     end
 
-    it "should not set the key from mass assignment" do
+    it "should set the key from mass assignment" do
       @widget.key = 'widget-key'
       @widget.attributes = {'key' => 'new-key'}
-      @widget.key.should == 'widget-key'
+      @widget.key.should == 'new-key'
     end
 
     it "should typecast the key to a string" do
@@ -206,7 +206,7 @@ describe Ripple::AttributeMethods do
     @widget['foo'].should == 'bar'
   end
 
-  it "should allow a block upon initialization to set attributes protected from mass assignment" do
+  it "should allow a block upon initialization to manipulate the newly created object" do
     @widget = Widget.new { |w| w.key = 'some-key' }
     @widget.key.should == 'some-key'
   end
@@ -216,18 +216,12 @@ describe Ripple::AttributeMethods do
     lambda { @widget.attributes = nil }.should raise_error(ArgumentError)
   end
 
-  it "should protect attributes from mass assignment when initialized" do
+  it "should not protect attributes from mass assignment when initialized" do
     @widget = Widget.new(:manufactured => true)
-    @widget.manufactured.should be_false
+    @widget.manufactured.should be_true
   end
 
-  it "should protect attributes from mass assignment by default" do
-    @widget = Widget.new
-    @widget.attributes = { :manufactured => true }
-    @widget.manufactured.should be_false
-  end
-
-  it "should allow protected attributes to be mass assigned via raw_attributes=" do
+  it "should allow attributes to be mass assigned via raw_attributes=" do
     @widget = Widget.new
     @widget.send(:raw_attributes=, { :manufactured => true })
     @widget.manufactured.should be_true
@@ -243,44 +237,53 @@ describe Ripple::AttributeMethods do
     lambda { @widget = Widget.new(:explode => '?BOOM') }.should raise_error(ArgumentError, %q[Undefined property :explode for class 'Widget'])
   end
 
-  it "should allow mass assigning arbitrary attributes when without_protection is specified" do
-    @widget = Widget.new({:manufactured => true}, :without_protection => true)
+  it "should allow mass assigning arbitrary attributes" do
+    @widget = Widget.new({:manufactured => true})
     @widget[:manufactured].should be_true
 
     @client = Ripple.client
     @client.stub(:store_object => true)
 
-    @widget = Widget.create({:manufactured => true}, :without_protection => true)
+    @widget = Widget.create({:manufactured => true})
     @widget[:manufactured].should be_true
 
-    @widget = Widget.create!({:manufactured => true}, :without_protection => true)
+    @widget = Widget.create!({:manufactured => true})
     @widget[:manufactured].should be_true
   end
 
-  it "default assign_attributes should respect mass attribute assignment security" do
-    @widget = Widget.new
-    @widget.assign_attributes(:manufactured => true)
-    @widget.manufactured.should be_false
-  end
-
-  if(ActiveModel::VERSION::MAJOR == 3 && ActiveModel::VERSION::MINOR == 0)
-    it "assigning attributes should respect roles" do
-      @widget = Widget.new
-      @widget.assign_attributes(:restricted => true)
-      @widget.restricted.should be_false
-
-      lambda do
-        @widget.assign_attributes({:restricted => true}, :as => :admin)
-      end.should raise_error(ArgumentError, %q[Roles for mass assignment are not supported for Rails 3.0])
+  context "forbidden attributes protection" do
+    let(:permitted_attributes) do
+      {manufactured: true}.tap do |hash|
+        def hash.permitted?
+          true
+        end
+      end
     end
-  else
-    it "assigning attributes with a role should raise an error" do
-      @widget = Widget.new
-      @widget.assign_attributes(:restricted => true)
-      @widget.restricted.should be_false
+    let(:unpermitted_attributes) do
+      {manufactured: true}.tap do |hash|
+        def hash.permitted?
+          false
+        end
+      end
+    end
 
-      @widget.assign_attributes({:restricted => true}, :as => :admin)
-      @widget.restricted.should be_true
+    it "should raise an error if tainted params assigned" do
+      proc{Widget.new(unpermitted_attributes)}.should raise_error(ActiveModel::ForbiddenAttributesError)
+      proc{Widget.create(unpermitted_attributes)}.should raise_error(ActiveModel::ForbiddenAttributesError)
+
+      widget = Widget.new
+      proc{widget.attributes = unpermitted_attributes}.should raise_error(ActiveModel::ForbiddenAttributesError)
+      proc{widget.assign_attributes(unpermitted_attributes)}.should raise_error(ActiveModel::ForbiddenAttributesError)
+    end
+
+    it "should not raise an error if untainted params assigned" do
+      Ripple.client.stub(store_object: true)
+
+      Widget.new(permitted_attributes).manufactured.should be_true
+      Widget.create(permitted_attributes).manufactured.should be_true
+
+      Widget.new.tap{|w| w.attributes = permitted_attributes}.manufactured.should be_true
+      Widget.new.tap{|w| w.assign_attributes(permitted_attributes)}.manufactured.should be_true
     end
   end
 end

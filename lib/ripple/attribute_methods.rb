@@ -1,7 +1,7 @@
 require 'ripple/translation'
 require 'active_support/concern'
 require 'active_model/attribute_methods'
-require 'active_model/mass_assignment_security'
+require 'active_model/forbidden_attributes_protection'
 require 'ripple/attribute_methods/read'
 require 'ripple/attribute_methods/write'
 require 'ripple/attribute_methods/query'
@@ -20,9 +20,9 @@ module Ripple
       include Write
       include Query
       include Dirty
-      include ActiveModel::MassAssignmentSecurity
+      include ActiveModel::ForbiddenAttributesProtection
 
-      attr_protected :key
+#      attr_protected :key
     end
 
     module ClassMethods
@@ -68,17 +68,7 @@ module Ripple
     def assign_attributes(attrs, options={})
       raise ArgumentError, t('attribute_hash') unless(Hash === attrs)
 
-      unless options[:without_protection]
-        if method(:sanitize_for_mass_assignment).arity == 1 # ActiveModel 3.0
-          if options[:as]
-            raise ArgumentError, t('mass_assignment_roles_unsupported')
-          end
-          attrs = sanitize_for_mass_assignment(attrs)
-        else
-          mass_assignment_role = (options[:as] || :default)
-          attrs = sanitize_for_mass_assignment(attrs, mass_assignment_role)
-        end
-      end
+      attrs = sanitize_for_mass_assignment(attrs)
 
       attrs.each do |k,v|
         if respond_to?("#{k}=")
