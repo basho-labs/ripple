@@ -17,7 +17,19 @@ describe Ripple::Callbacks do
   end
 
   subject { doc.new }
-
+  
+  it "destroy should return false and not destroy the document when a callback returns false" do
+    # Make double sure, test without before_destroy first
+    u = User.create!(:email => 'nobody@domain.com')
+    u.destroy.should_not be false
+    User.find(u.key).should be nil
+    # Now real test
+    User.before_destroy { false }
+    u = User.create!(:email => 'nobody@domain.com')
+    u.destroy.should be false
+    User.find(u.key).should be_an_instance_of(User)
+  end
+  
   it "should add create, update, save, and destroy callback declarations" do
     [:save, :create, :update, :destroy].each do |event|
       doc.private_instance_methods.map(&:to_s).should include("_run_#{event}_callbacks")
