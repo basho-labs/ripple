@@ -1,6 +1,15 @@
 source 'https://rubygems.org'
 
-gemspec
+#gemspec
+
+gem "riak-client"
+gem "activesupport", ">= 3.0.0"
+gem "tzinfo"
+
+group :development, :test do
+  gem "rake"
+  gem "ammeter"
+end
 
 group :guard do
   gem 'guard-rspec'
@@ -13,5 +22,5 @@ if File.directory?(File.expand_path("../../riak-client", __FILE__))
 end
 
 platforms :jruby do
-  gem 'jruby-openssl'
+ gem 'jruby-openssl'
 end

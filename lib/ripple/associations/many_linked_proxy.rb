@@ -8,11 +8,6 @@ module Ripple
       include Many
       include Linked
 
-      def count
-        # avoid having to load all documents by using our keys set instead
-        keys.size
-      end
-
       def <<(value)
         if loaded?
           new_target = @target.concat(Array.wrap(value))
@@ -51,11 +46,21 @@ module Ripple
         robjs.delete_if do |robj|
           appended_documents.any? do |doc|
             doc.key == robj.key &&
-            doc.class.bucket_name == robj.bucket.name
+              doc.class.bucket_name == robj.bucket.name
           end
         end
 
-        appended_documents + robjs.map {|robj| klass.send(:instantiate, robj) }
+        docs = appended_documents + robjs.map {|robj| klass.send(:instantiate, robj) }
+        read_repair_association docs
+        docs
+      end
+
+      def read_repair_association(validated_docs)
+        matched_keys = validated_docs.map{|o| o.key}
+        @owner.robject.links.delete_if { |link|
+          ! (matched_keys.include?(link.key) ||
+             link.tag != reflection.name.to_s )
+        }
       end
 
       def appended_documents
