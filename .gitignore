@@ -34,3 +34,4 @@ Gemfile*.lock
 vendor/erlang
 vendor/riak
 tmp/*
+method_search_order.rb
