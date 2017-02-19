@@ -27,6 +27,7 @@ module Ripple
       options[:env][:riak_kv][:map_cache_size] ||= 0
       options[:env][:riak_core] ||= {}
       options[:env][:riak_core][:http] ||= [ Tuple[Ripple.config[:host], Ripple.config[:http_port]] ]
+      options[:env][:riak_core][:handoff_port] ||= Ripple.config[:handoff_port]
       options[:env][:riak_kv][:pb_port] ||= Ripple.config[:pb_port]
       options[:env][:riak_kv][:pb_ip] ||= Ripple.config[:host]
       super(options)
