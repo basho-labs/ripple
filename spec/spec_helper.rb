@@ -7,13 +7,14 @@ require 'ripple'
 require 'ripple/conflict/test_helper'
 require 'rspec'
 require 'ammeter'
+require 'coveralls'
+Coveralls.wear!
 
 # Only the tests should really get away with this.
 Riak.disable_list_keys_warnings = true
 
 %w[
    integration_setup
-   generator_setup
    test_server
    search
    models
