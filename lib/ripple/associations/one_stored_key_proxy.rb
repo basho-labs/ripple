@@ -30,7 +30,7 @@ module Ripple
       end
 
       def key_name
-        "#{@reflection.name}_key"
+        @reflection.options[:foreign_key] || "#{@reflection.name}_key"
       end
 
       def find_target

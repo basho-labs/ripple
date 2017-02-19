@@ -58,14 +58,13 @@ module Ripple
         self.owner_keys = []
       end
 
-
       protected
       def find_target
         klass.find(keys.to_a)
       end
 
       def keys_name
-        "#{@reflection.name.to_s.singularize}_keys"
+        (@reflection.options[:foreign_key] || "#{@reflection.name.to_s.singularize}_keys").to_s
       end
 
       def owner_keys=(new_keys)

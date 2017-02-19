@@ -69,4 +69,30 @@ describe Ripple::Associations::OneStoredKeyProxy do
     @transaction.account.should be_nil
     @transaction.account_key.should be_nil
   end
+
+  context "Foreign key associations" do
+    before do
+      @president = User.create(email: 'president@internet.com')
+    end
+
+    after do
+      Country.destroy_all
+      User.destroy_all
+    end
+
+    it "should accept a foreign key to create an association" do
+      country = Country.create(name: 'Internet', president_user_id: @president.key)
+
+      country.president.should == @president
+      # TODO: Write this assert on OneInverseProxy test file
+      @president.president_of.should == country
+    end
+
+    it "should update foreign key value when updates the association" do
+      country = Country.create(name: 'Internet')
+      country.president = @president
+
+      country.president_user_id.should == @president.key
+    end
+  end
 end

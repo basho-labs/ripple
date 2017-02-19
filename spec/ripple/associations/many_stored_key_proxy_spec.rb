@@ -155,4 +155,22 @@ describe Ripple::Associations::ManyStoredKeyProxy do
     lambda { @account.transactions << Transaction.new }.should raise_error
   end
 
+  context "Foreign key associations" do
+    after do
+      Country.destroy_all
+      User.destroy_all
+    end
+
+    it "should accept a foreing key to create the association" do
+      citizen1 = User.create(email: 'citizen1@internet.com')
+      citizen2 = User.create(email: 'citizen2@internet.com')
+      citizen3 = User.create(email: 'citizen3@internet.com')
+      country = Country.create(name: 'Internet',
+                               citizen_user_ids: [citizen1.key, citizen2.key, citizen3.key])
+
+      country.citizens.should include(citizen1)
+      country.citizens.should include(citizen2)
+      country.citizens.should include(citizen3)
+    end
+  end
 end
