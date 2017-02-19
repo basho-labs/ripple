@@ -13,7 +13,7 @@ module Ripple
 
     # True if this is not a new document
     def persisted?
-      !new?
+      !new? && !deleted?
     end
 
     # Converts to a view key

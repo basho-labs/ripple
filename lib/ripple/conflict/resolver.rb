@@ -11,7 +11,7 @@ module Ripple
 
       def self.to_proc
         @to_proc ||= lambda do |robject|
-          possible_model_classes = robject.siblings.map { |s| s.data && s.data['_type'] }.compact.uniq
+          possible_model_classes = robject.siblings.map { |s| s.data && s.data['_type'] if s.raw_data.size != 0 }.compact.uniq
           return nil unless possible_model_classes.size == 1
 
           resolver = new(robject, possible_model_classes.first.constantize)
@@ -42,7 +42,7 @@ module Ripple
             #       RObject to know it has loaded a deleted sibling.
             #       Here we assume it is deleted if the data is nil because
             #       that's the only way we know of that the data can be nil.
-            record.instance_variable_set(:@deleted, true) if s.data.nil?
+            record.instance_variable_set(:@deleted, true) if s.raw_data.size == 0 || s.data.nil?
           end
         end
       end

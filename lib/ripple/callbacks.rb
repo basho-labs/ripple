@@ -40,7 +40,11 @@ module Ripple
     # @private
     def really_save(*args, &block)
       run_save_callbacks do
-        super
+        if self.deleted?
+          false
+        else
+          super
+        end
       end
     end
     
